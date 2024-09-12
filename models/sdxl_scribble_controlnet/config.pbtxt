@@ -1,0 +1,39 @@
+name: "sdxl_scribble_controlnet"
+backend: "python"
+max_batch_size: 8
+
+input [
+  {
+    name: "prompt"
+    data_type: TYPE_STRING
+    dims: [ -1 ]
+    
+  },
+  {
+    name: "image"
+    data_type: TYPE_STRING
+    dims: [ -1 ]
+    
+  },
+  {
+    name: "conditioning_scale"
+    data_type: TYPE_STRING
+    dims: [ -1 ]
+    optional: true
+  }
+
+]
+
+output [
+  {
+    name: "generated_image"
+    data_type: TYPE_STRING	
+    dims: [ -1 ]
+  }
+]
+
+# instance_group [
+#   {
+#     kind: KIND_GPU
+#   }
+# ]
