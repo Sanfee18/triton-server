@@ -60,9 +60,9 @@ class TritonPythonModel:
         self.pipe.to("cuda")
         # enable xformers (optional), requires xformers installation
         # https://github.com/facebookresearch/xformers#installing-xformers
-        # self.pipe.unet.enable_xformers_memory_efficient_attention()
+        self.pipe.unet.enable_xformers_memory_efficient_attention()
         # cpu offload for memory saving, requires accelerate>=0.17.0
-        # self.pipe.enable_model_cpu_offload()
+        self.pipe.enable_model_cpu_offload()
 
     def execute(self, requests):
         responses = []

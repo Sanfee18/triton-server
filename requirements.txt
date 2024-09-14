@@ -1,3 +1,4 @@
+accelerate==0.34.2
 appnope==0.1.4
 asttokens==2.4.1
 attrs==23.1.0
@@ -76,4 +77,5 @@ urllib3==2.2.3
 wcwidth==0.2.13
 wheel==0.43.0
 wsproto==1.2.0
+xformers==0.0.28.post1
 zipp==3.20.1
