@@ -1,16 +1,17 @@
-# Setting up Triton Inference Server on EC2
+# Setting up Triton Inference Server on EC2
 
 This guide walks you through setting up a Triton Inference Server on an EC2 instance, building the Docker image, and running it with model synchronization from an S3 bucket.
+
+---
 
 ## Prerequisites
 
 - An EC2 instance with GPU support (such as a `g4dn.xlarge` or `p3` instance type).
 - A `Dockerfile` and `run.sh` script prepared for building your Triton Inference Server (you can clone these from the repository).
-- An S3 bucket containing the model repository structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html).
-> The repository includes a models folder with an example structure of a model repository. Use this structure as a guide for organizing your own models in the S3 bucket to ensure compatibility with Triton Inference Server.
+- An S3 bucket containing the model repository structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html). > This repository includes a models folder with an example structure of a model repository. Use this structure as a guide for organizing your own models in the S3 bucket to ensure compatibility with Triton Inference Server.
 
-## Clone the Reposity
-To get all the necessary files for setting up the Triton Inference Server, clone the project repository on your local machine:
+### Clone the Repository
+To get all the necessary files for setting up the Triton Inference Server, clone the project repository on your **local machine**: 
 
 ```bash
 git clone https://github.com/Sanfee18/triton-inference-server.git
