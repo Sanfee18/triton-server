@@ -6,12 +6,14 @@ This guide walks you through setting up a Triton Inference Server on an EC2 inst
 
 ## Prerequisites
 
-- An EC2 instance with GPU support (such as a `g4dn.xlarge` or `p3` instance type).
+- An EC2 instance with GPU support (such as a `g4dn.xlarge` or `p3` instance type). <--- Create and link documentation for setting up EC2 instance
 - A `Dockerfile` and `run.sh` script prepared for building your Triton Inference Server (you can clone these from the repository).
-- An S3 bucket containing the model repository structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html). > This repository includes a models folder with an example structure of a model repository. Use this structure as a guide for organizing your own models in the S3 bucket to ensure compatibility with Triton Inference Server.
+- An S3 bucket containing the model repository structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html).
+
+  > This repository includes a models folder with an example structure of a model repository. Use this structure as a guide for organizing your own models in the S3 bucket to ensure compatibility with Triton Inference Server.
 
 ### Clone the Repository
-To get all the necessary files for setting up the Triton Inference Server, clone the project repository on your **local machine**: 
+To get all the **necessary files** for setting up the Triton Inference Server, clone the project repository on your **local machine**: 
 
 ```bash
 git clone https://github.com/Sanfee18/triton-inference-server.git
@@ -60,7 +62,7 @@ cd downloads/
 On your local machine, transfer the `Dockerfile` and `run.sh` to the EC2 instance using `scp`. Replace `<path_to_pem>` with the actual path to your `.pem` file, and `<ec2_public_ip>` with the EC2 instance's public IP address.
 
 ```bash
-scp -i <path_to_pem> Dockerfile run.sh ec2-user@<ec2_public_ip>:/home/ec2-user/downloads
+scp -i <path_to_pem_file> Dockerfile run.sh ec2-user@<ec2_public_ip>:/home/ec2-user/downloads
 ```
 
 ### 6. Change Directory to Downloads on the EC2 Instance
@@ -78,6 +80,10 @@ Build the Docker image using the `Dockerfile` that was transferred. This image i
 ```bash
 sudo docker build -t ec2-triton:latest -f Dockerfile .
 ```
+
+> Because you may be using a Mac with an ARM architecture (M chip), the Docker image you build locally may not be compatible with the x86 architecture of the EC2 instance. Therefore, it is recommended to build the Docker image directly on the EC2 instance where it will be deployed.
+
+Alternatively, you could build the image on a compatible machine, upload it to Amazon Elastic Container Registry (ECR), and then pull it from there onto the EC2 instance. This guide shows the manual process of building the image directly on the EC2 instance for simplicity.
 
 ### 8. Run the Docker Container
 
