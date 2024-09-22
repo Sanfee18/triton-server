@@ -88,12 +88,13 @@ Alternatively, you could build the image on a compatible machine, upload it to A
 ### 8. Run the Docker Container
 
 Run the Docker container with GPU support and expose the Triton Inference Server on the appropriate ports (8000 for HTTP, 8001 for gRPC, 8002 for metrics). 
-You have to specify the `MODEL_REPOSITORY` variable for the `run.sh` script to be able to load the models from your S3 bucket. 
+Set `--net=host` so FastAPI can access this ports from localhost.
 
 ```bash
 docker run --gpus=all -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models \
--p 8000:8000 -p 8001:8001 -p 8002:8002 ec2-triton:latest
+--net=host -p 8000:8000 -p 8001:8001 -p 8002:8002 ec2-triton:latest
 ```
+> You have to specify the `MODEL_REPOSITORY` variable for the `run.sh` script to be able to load the models from your S3 bucket.
 
 ### 9. Accessing the Triton Inference Server
 
