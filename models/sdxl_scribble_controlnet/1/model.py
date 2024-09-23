@@ -42,7 +42,6 @@ class TritonPythonModel:
         self.pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             controlnet=controlnet,
-            safety_checker=None,
             torch_dtype=torch.float16,
         )
 

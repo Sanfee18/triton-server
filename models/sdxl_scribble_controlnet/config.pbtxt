@@ -17,7 +17,7 @@ input [
   },
   {
     name: "conditioning_scale"
-    data_type: TYPE_STRING
+    data_type: TYPE_FP32
     dims: [ -1 ]
     optional: true
   }
@@ -31,9 +31,3 @@ output [
     dims: [ -1 ]
   }
 ]
-
-# instance_group [
-#   {
-#     kind: KIND_GPU
-#   }
-# ]
