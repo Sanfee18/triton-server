@@ -38,7 +38,7 @@ cd triton-inference-server
 
 It's really important that you understand the steps involved in creating the Triton Docker image.
 
-** 1. Choose a Base Image **
+**1. Choose a Base Image**
 
 First, you have to understand the different [backends](https://github.com/triton-inference-server/backend) supported by Triton.
 Then, you should be able to determine which [official NVIDIA Docker image](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags) suits your needs the best.
@@ -48,7 +48,7 @@ Since our models are going to be loaded using Python via Hugging Face's diffuser
 FROM nvcr.io/nvidia/tritonserver:24.08-pyt-python-py3
 ```
 
-** 2. Install AWS CLI **
+**2. Install AWS CLI**
 
 We then install the AWS CLI commands on the Docker: 
 
@@ -69,7 +69,7 @@ This will allow the `run.sh` file to access AWS commands to sync the S3 bucket m
 aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
 ```
 
-** 3. Add Dependencies **
+**3. Add Dependencies**
 
 Triton Docker image doesn't include any preinstalled Python libraries, so you'll need to add the necessary ones for your model or business logic.
 
@@ -83,19 +83,19 @@ RUN pip install -r /tmp/requirements.txt
 
 Launch the EC2 and follow the next steps:
 
-** 1. Update the Packages **
+**1. Update the Packages**
 
 ```bash
 sudo yum update -y
 ```
 
-** 2. Install Docker **
+**2. Install Docker**
 
 ```bash
 sudo amazon-linux-extras install docker
 ```
 
-** 3. Start the Docker Service **
+**3. Start the Docker Service**
 
 ```bash
 sudo service docker start
@@ -106,14 +106,14 @@ sudo service docker start
 
 If you've cloned this repository, you may have the necessary files to build the Docker image. Then follow this steps:
 
-** 1. Create a Downloads Directory on the EC2 **
+**1. Create a Downloads Directory on the EC2**
 
 ```bash
 mkdir /home/ec2-user/downloads
 cd /home/ec2-user/downloads/
 ```
 
-** 2. Transfer Files from Your Local Machine **
+**2. Transfer Files from Your Local Machine**
 
 Make sure to be inside the `triton-inference-server` folder on your `local machine` and ** execute ** this command:
 ```bash
