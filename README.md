@@ -66,6 +66,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 This will allow the `run.sh` file to access AWS commands to sync the S3 bucket model repository inside the `/tmp/model-repository` folder everytime the container is run:
 
 ```bash
+# run.sh
+
 aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
 ```
 
@@ -147,8 +149,8 @@ docker run --gpus=all -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models \
 ```
 > You have to specify the `MODEL_REPOSITORY` environment variable for the `run.sh` script to be able to load the models from your S3 bucket.
 
-## Accessing the Triton Inference Server
 ---
+## Accessing the Triton Inference Server
 
 Once the server is running, you can access:
 - **Inference requests**: http://<ec2_public_ip>:8000/v2/models
@@ -156,3 +158,5 @@ Once the server is running, you can access:
 - **Metrics**: http://<ec2_public_ip>:8002/metrics
 
 Ensure that your security group allows inbound traffic on these ports.
+
+You may want use a [client library](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client/README.html) to perform the requests to the Triton Inference Server.
