@@ -41,6 +41,7 @@ It's really important that you understand the steps involved in creating the Tri
 **1. Choose a Base Image**
 
 First, you have to understand the different [backends](https://github.com/triton-inference-server/backend) supported by Triton.
+
 Then, you should be able to determine which [official NVIDIA Docker image](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags) suits your needs the best.
 
 Since our models are going to be loaded using Python via Hugging Face's diffusers library, we used the Docker image which only supports PyTorch and Python backends:
@@ -67,7 +68,6 @@ This will allow the `run.sh` file to access AWS commands to sync the S3 bucket m
 
 ```bash
 # run.sh
-
 aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
 ```
 
@@ -117,7 +117,7 @@ cd /home/ec2-user/downloads/
 
 **2. Transfer Files from Your Local Machine**
 
-Make sure to be inside the `triton-inference-server` folder on your `local machine` and ** execute ** this command:
+Make sure to be inside the `triton-inference-server` folder on your `local machine` and **execute** this command:
 ```bash
 scp -i <path_to_pem_file> Dockerfile requirements.txt run.sh ec2-user@<ec2_public_ip>:/home/ec2-user/downloads
 ```
@@ -152,11 +152,11 @@ docker run --gpus=all -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models \
 ---
 ## Accessing the Triton Inference Server
 
+You may want use a [client library](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client/README.html) to perform the requests to the Triton Inference Server.
+
 Once the server is running, you can access:
 - **Inference requests**: http://<ec2_public_ip>:8000/v2/models
 - **gRPC requests**: Port 8001 (gRPC clients required).
 - **Metrics**: http://<ec2_public_ip>:8002/metrics
 
 Ensure that your security group allows inbound traffic on these ports.
-
-You may want use a [client library](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client/README.html) to perform the requests to the Triton Inference Server.
