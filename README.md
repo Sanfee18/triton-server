@@ -12,8 +12,8 @@ For a more detailed introduction on how the server works, be sure to check out t
 
 <!-- TODO: Add section on how to configure the EC2 instance -->
 
-- An EC2 instance with GPU support (such as a `g4dn.xlarge` or `p3` instance type). 
-- An S3 bucket containing the model repository structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html).
+- An EC2 instance with **GPU support** (such as a `g4dn.xlarge` or `p3` instance type). 
+- An S3 bucket containing the **model repository** structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html).
 
   > This repository includes a models folder with an example structure of a model repository. Use this structure as a guide for organizing your own models in the S3 bucket to ensure compatibility with Triton Inference Server.
   >```bash
