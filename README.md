@@ -1,10 +1,8 @@
 # Setting up Triton Inference Server on EC2
 
-Here’s a more polished version of the paragraph:
+This guide walks you through setting up a Triton Inference Server on an EC2 instance, building the Docker image, and running it with model synchronization from an S3 bucket.
 
-"This guide walks you through setting up a Triton Inference Server on an EC2 instance, building the Docker image, and running it with model synchronization from an S3 bucket.
-
-For a more detailed introduction on how the server works, be sure to check out the [Triton Inference Server Quickstart Guide](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/getting_started/quickstart.html)."
+For a more detailed introduction on how the server works, be sure to check out the [Triton Inference Server Quickstart Guide](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/getting_started/quickstart.html).
 > [!Note]
 >
 > This is **not** a Docker or AWS tutorial. If you’re new to Docker or AWS, I recommend checking out some great resources online to get up to speed before diving in!
