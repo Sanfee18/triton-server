@@ -6,8 +6,9 @@ This guide walks you through setting up a Triton Inference Server on an EC2 inst
 >
 > This is **not** a Docker or AWS tutorial. If you’re new to Docker or AWS, I recommend checking out some great resources online to get up to speed before diving in!
 
-## Prerequisites 
 ---
+## Prerequisites 
+
 <!-- TODO: Add section on how to configure the EC2 instance -->
 
 - An EC2 instance with GPU support (such as a `g4dn.xlarge` or `p3` instance type). 
@@ -22,8 +23,9 @@ This guide walks you through setting up a Triton Inference Server on an EC2 inst
   >      └── config.pbtxt
   >```
 
-## Clone the repository 
 ---
+## Clone the repository 
+
 On your **local machine**, clone the project repository with all the **necessary files** for setting up the `Triton Inference Server`: 
 
 ```bash.
@@ -31,8 +33,8 @@ git clone https://github.com/Sanfee18/triton-inference-server.git
 cd triton-inference-server
 ```
 
-## Understanding Dockerfile
 ---
+## Understanding Dockerfile
 
 It's really important that you understand the steps involved in creating the Triton Docker image.
 
