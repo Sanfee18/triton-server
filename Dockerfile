@@ -11,9 +11,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && rm -f awscliv2.zip
 
 # INSTALL DEPENDENCIES
-RUN pip install torch torchvision torchaudio
-RUN pip install transformers diffusers
-RUN pip install xformers accelerate
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 # COPY ENTRYPOINT FILE
 COPY run.sh /tmp/run.sh
