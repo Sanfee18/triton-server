@@ -156,8 +156,8 @@ docker run --gpus=all -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models \
 You may want use a [client library](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client/README.html) to perform the requests to the Triton Inference Server.
 
 Once the server is running, you can access:
-- **Inference requests**: http://<ec2_public_ip>:8000/v2/models
-- **gRPC requests**: Port 8001 (gRPC clients required).
-- **Metrics**: http://<ec2_public_ip>:8002/metrics
+- `Inference requests`: http://<ec2_public_ip>:8000/v2/models
+- `gRPC requests`: Port 8001 (gRPC clients required).
+- `Metrics`: http://<ec2_public_ip>:8002/metrics
 
 Ensure that your security group allows inbound traffic on these ports.
