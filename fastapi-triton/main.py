@@ -14,9 +14,7 @@ MODEL_NAME = "sdxl_scribble_controlnet"
 async def startup_event():
     global triton_client
     try:
-        triton_client = httpclient.InferenceServerClient(
-            url=TRITON_URL, connection_timeout=120.0, network_timeout=120.0
-        )
+        triton_client = httpclient.InferenceServerClient(url=TRITON_URL)
         if not triton_client.is_server_live():
             raise RuntimeError("Triton server is not live.")
     except Exception as e:
