@@ -10,6 +10,10 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && ./aws/install \
     && rm -f awscliv2.zip
 
+RUN apt-get update -y 
+RUN apt-get install -y pkg-config
+RUN apt-get install -y libcairo2-dev libjpeg-dev libgif-dev
+
 # INSTALL DEPENDENCIES
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt

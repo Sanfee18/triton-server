@@ -1,0 +1,54 @@
+{
+  "metrics": {
+    "metrics_collected": {
+      "cpu": {
+        "resources": ["*"], 
+        "measurement": [
+          "usage_active",
+          "usage_idle",
+          "usage_iowait",
+          "usage_nice",
+          "usage_softirq",
+          "usage_steal",
+          "usage_system",
+          "usage_user"
+        ],
+        "totalcpu": true,
+        "metrics_collection_interval": 10
+      },
+      "nvidia_gpu": {
+        "resources": ["*"], 
+        "measurement": [
+          "utilization_gpu",
+          "utilization_memory",
+          "memory_used",
+          "memory_free",
+          "memory_total"
+        ],
+        "metrics_collection_interval": 10
+      },
+      "mem": {
+        "measurement": [
+          "used_percent",
+          "available",
+          "available_percent",
+          "used",
+          "free",
+          "total"
+        ],
+        "metrics_collection_interval": 10
+      },
+      "disk": {
+        "resources": ["*"],
+        "measurement": [
+          "used_percent",
+          "used",
+          "free",
+          "total"
+        ],
+        "metrics_collection_interval": 10
+      }
+    }
+  }
+}
+

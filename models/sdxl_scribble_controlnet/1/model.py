@@ -66,64 +66,83 @@ class TritonPythonModel:
     def execute(self, requests):
         responses = []
         for request in requests:
-            prompt = (
-                pb_utils.get_input_tensor_by_name(request, "prompt")
-                .as_numpy()
-                .item()
-                .decode("utf-8")
-            )
-            image = (
-                pb_utils.get_input_tensor_by_name(request, "image")
-                .as_numpy()
-                .item()
-                .decode("utf-8")
-            )
-            conditioning_scale = pb_utils.get_input_tensor_by_name(
-                request, "conditioning_scale"
-            )
+            # Debug: Print the incoming request details
+            print("Incoming request:")
+            print(request)
 
-            if not prompt or not image:
-                # If there is an error, there is no need to pass the
-                # "output_tensors" to the InferenceResponse. The "output_tensors"
-                # that are passed in this case will be ignored.
+            try:
+                # Extract inputs from the request
+                prompt = (
+                    pb_utils.get_input_tensor_by_name(request, "prompt")
+                    .as_numpy()
+                    .item()
+                    .decode("utf-8")
+                )
+                image_str = (
+                    pb_utils.get_input_tensor_by_name(request, "image")
+                    .as_numpy()
+                    .item()
+                    .decode("utf-8")
+                )
+                conditioning_scale = (
+                    pb_utils.get_input_tensor_by_name(request, "conditioning_scale")
+                    .as_numpy()
+                    .item()
+                )
+
+                # Debug: Print extracted inputs
+                print(f"Prompt: {prompt}")
+                print(
+                    f"Image string: {image_str[:30]}..."
+                )  # Print only the first 30 characters
+                print(f"Conditioning scale: {conditioning_scale}")
+
+                # Decode the Base64 image string to a PIL image
+                image = decode_image(image_str)
+
+                # Convert the PIL image to a NumPy array
+                image_np = np.array(image)
+
+                # Add a batch dimension to the image shape
+                image_np = np.expand_dims(
+                    image_np, axis=0
+                )  # Shape should now be [1, height, width, channels]
+
+                # Prepare the input arguments for the model
+                input_args = {
+                    "prompt": prompt,
+                    "negative_prompt": "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
+                    "image": image_np,
+                    "width": 1024,
+                    "height": 1024,
+                    "num_inference_steps": 30,
+                    "conditioning_scale": conditioning_scale,
+                }
+
+                # Debug: Print input arguments before processing
+                print("Input arguments for model:", input_args)
+
+                # Call the model
+                images = self.pipe(**input_args).images
+
+                encoded_images = encode_images(images)
+
                 responses.append(
                     pb_utils.InferenceResponse(
-                        error=pb_utils.TritonError(
-                            "The prompt or image is empty or not provided."
-                        )
+                        [
+                            pb_utils.Tensor(
+                                "generated_image",
+                                np.array(encoded_images).astype(object),
+                            )
+                        ]
                     )
                 )
-                continue
-
-            # create the arguments for the generation
-            negative_prompt = "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality"
-
-            input_args = dict(
-                prompt=prompt,
-                negative_prompt=negative_prompt,
-                image=image,
-                width=1024,
-                height=1024,
-                num_inference_steps=30,
-            )
-
-            if conditioning_scale:
-                input_args["conditioning_scale"] = conditioning_scale
-
-            image = decode_image(image)
-
-            images = self.pipe(**input_args).images
-
-            encoded_images = encode_images(images)
-
-            responses.append(
-                pb_utils.InferenceResponse(
-                    [
-                        pb_utils.Tensor(
-                            "generated_image", np.array(encoded_images).astype(object)
-                        )
-                    ]
+            except Exception as e:
+                print(f"Error processing request: {e}")
+                responses.append(
+                    pb_utils.InferenceResponse(
+                        error=pb_utils.TritonError(f"Failed to process request: {e}")
+                    )
                 )
-            )
 
         return responses
