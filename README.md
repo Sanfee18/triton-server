@@ -142,7 +142,7 @@ Replace:
 ## `Step 3:` Build the Docker Image
 ---
 
-Build the Docker image using the `Dockerfile` that was transferred.
+Build the Docker image using the transferred `Dockerfile`:
 
 ```bash
 sudo docker build -t triton-server:latest -f Dockerfile .
