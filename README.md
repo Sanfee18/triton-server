@@ -2,7 +2,7 @@
 
 This guide walks you through setting up a Triton Inference Server on an EC2 instance, building the Docker image, and running it with model synchronization from an S3 bucket.
 
-I **strongly recommend** reading the [Triton Inference Server Documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/) to gain a comprehensive understanding of each component in the Triton ecosystem. This will help you configure and optimize the server to your needs.
+I **strongly recommend** reading the [Triton Inference Server Documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/) to gain a solid understanding of each Triton Server component.
 > [!Note]
 >
 > This is **not** a Docker or AWS tutorial. If you’re new to this technologies, I recommend checking out some great resources online to get up to speed before diving in!
@@ -26,7 +26,8 @@ Before setting up the Triton Inference Server, ensure you meet the following req
   >```
   > Use this structure as a template to organize your models for compatibility with Triton.
 
-- **Backends in Triton Inference Server**: Triton supports [multiple model backends](https://github.com/triton-inference-server/backend) (such as Python, PyTorch, TensorFlow or ONNX), which allow it to serve models from different frameworks. You'll be selecting the appropriate backend later in this guide when configuring the Dockerfile.
+- **Backends in Triton Inference Server**: Triton supports multiple [model backends](https://github.com/triton-inference-server/backend) (such as PyTorch, TensorFlow, ONNX or Python).
+> You'll be selecting the appropriate backend later in this guide when configuring the Dockerfile.
 
 ---
 ## Clone the Repository
@@ -54,9 +55,9 @@ It's really important that you understand the steps involved in creating the Tri
 
 **1. Choose a Base Image**
 
-Start by choosing a suitable Triton base image from the official [NVIDIA Docker repository](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags). This base image must align with the backend needed for your model.
+Start by choosing a suitable Triton base image from the official [NVIDIA Docker catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags). This base image must align with the backend needed for your model.
 
-Since our models are going to be loaded using Python via Hugging Face's diffusers library, we used the Docker image which only supports PyTorch and Python backends:
+Since our models are going to be loaded using `Python` via Hugging Face's diffusers library, we used the Docker image which only supports **PyTorch** and **Python** backends:
 ```bash
 FROM nvcr.io/nvidia/tritonserver:24.08-pyt-python-py3
 ```
@@ -79,13 +80,13 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 This setup ensures that the `run.sh` script, executed when the container starts, can pull models from your S3 bucket into the local `/tmp/model_repository` directory:
 
 ```bash
-# run.sh file
+# run.sh
 aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
 ```
 
 **3. Add Dependencies**
 
-Triton Docker images don’t come pre-installed with any Python libraries. You’ll need to manually add them to fit your requirements:
+Since Triton Docker images don’t come pre-installed with any Python libraries, you’ll need to manually add them to fit your requirements:
 
 ```bash
 COPY requirements.txt /tmp/requirements.txt
@@ -146,7 +147,8 @@ Build the Docker image using the `Dockerfile` that was transferred.
 ```bash
 sudo docker build -t triton-server:latest -f Dockerfile .
 ```
-> **Note:**
+> [!Note]
+>
 > If you're using a Mac with an ARM architecture (M chip), your local Docker build may not be compatible with the x86 architecture of the EC2 instance. It's recommended to build the Docker image directly on the EC2 instance for compatibility.
 
 Alternatively, you can build the image on a compatible machine, push it to **Amazon Elastic Container Registry (ECR)**, and then pull it onto your EC2 instance.
@@ -159,11 +161,13 @@ Run the Docker container with GPU support:
 ```bash
 docker run --gpus=all ---net=host -d -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models triton-server:latest
 ```
-> Replace <s3-bucket-name> with the name of your S3 bucket containing the models folder.
+Replace:
+- `<s3-bucket-name>` with the name of your S3 bucket containing the models folder.
 
-**Note:**
-- You have to set `--net=host` so FastAPI can access Triton server ports on `localhost`.
-- You also need to specify the `MODEL_REPOSITORY` environment variable for the `run.sh` script to be able to load the models from your S3 bucket.
+> [!Note]
+>
+> - You have to set `--net=host` so FastAPI can access Triton server ports on `localhost`.
+> - You also need to specify the `MODEL_REPOSITORY` environment variable for the `run.sh` script to be able to load the models from your S3 bucket.
 
 ### Verify Server Status
 
@@ -171,14 +175,10 @@ You can verify that the Triton Inference Server has started successfully by chec
 ```bash
 docker logs -f <docker-container-id>
 ```
-> You can retrieve the `container-id` using:
->
->```bash
->docker ps
->```
+> You can retrieve the `docker-container-id` using `docker ps` command.
 
 ---
-## Accessing the Triton Inference Server
+## `Last Step:` Accessing the Triton Inference Server
 
 We will be using a [FastAPI frontend](fastapi-triton/) to interact with the Triton Inference Server, making it easier to handle inference requests through a REST API.
 

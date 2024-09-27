@@ -1,5 +1,3 @@
-You may want use a [client library](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client/README.html) to perform the requests to the Triton Inference Server.
-
 # FastAPI Frontend for Triton Inference Server
 
 This guide will walk you through the process of launching a FastAPI application inside a Docker container on your EC2 instance. This FastAPI app will interact with the Triton Inference Server for running inference on the `sdxl_scribble_controlnet` model.
