@@ -149,7 +149,7 @@ sudo docker build -t triton-server:latest -f Dockerfile .
 ```
 > [!Note]
 >
-> If you're using a Mac with an ARM architecture (M chip), your local Docker build may not be compatible with the x86 architecture of the EC2 instance. It's recommended to build the Docker image directly on the EC2 instance for compatibility.
+> If you're using a Mac with an ARM architecture (M chip), your local Docker build may not be compatible with the x86 architecture of the EC2 instance. That's why we are building the Docker image directly on the EC2 instance to ensure compatibility.
 
 Alternatively, you can build the image on a compatible machine, push it to **Amazon Elastic Container Registry (ECR)**, and then pull it onto your EC2 instance.
 
