@@ -166,8 +166,8 @@ Replace:
 
 > [!Note]
 >
-> - You have to set `--net=host` so FastAPI can access Triton server ports on `localhost`.
-> - You also need to specify the `MODEL_REPOSITORY` environment variable for the `run.sh` script to be able to load the models from your S3 bucket.
+> - We've set `--net=host` so FastAPI can access Triton server ports on `localhost`.
+> - You need to specify the `MODEL_REPOSITORY` environment variable for the `run.sh` script to be able to load the models from your S3 bucket.
 
 ### Verify Server Status
 
