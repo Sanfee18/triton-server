@@ -177,8 +177,8 @@ docker logs -f <docker-container-id>
 ```
 > You can retrieve the `docker-container-id` using `docker ps` command.
 
----
 ## `Last Step:` Accessing the Triton Inference Server
+---
 
 We will be using a [FastAPI frontend](fastapi-triton/) to interact with the Triton Inference Server, making it easier to handle inference requests through a REST API.
 
