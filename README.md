@@ -2,7 +2,7 @@
 
 This guide walks you through setting up a Triton Inference Server on an EC2 instance, building the Docker image, and running it with model synchronization from an S3 bucket.
 
-For a more detailed introduction on how the server works, be sure to check out the [Triton Inference Server Quickstart Guide](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/getting_started/quickstart.html).
+Please make sure to check out the [Triton Inference Server Documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/) for more detailed information.
 > [!Note]
 >
 > This is **not** a Docker or AWS tutorial. If you’re new to Docker or AWS, I recommend checking out some great resources online to get up to speed before diving in!
@@ -12,7 +12,7 @@ For a more detailed introduction on how the server works, be sure to check out t
 
 <!-- TODO: Add section on how to configure the EC2 instance -->
 
-- An EC2 instance with **GPU support** (such as a `g4dn.xlarge` or `p3` instance type). 
+- An EC2 instance with **GPU support** (such as a `g4dn.xlarge` or `p3` instance type) and Amazon Linux OS.
 - An S3 bucket containing the **model repository** structured as expected by the Triton Inference Server. For more details, refer to the [Triton Inference Server Model Repository documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_repository.html).
 
   > This repository includes a models folder with an example structure of a model repository. Use this structure as a guide for organizing your own models in the S3 bucket to ensure compatibility with Triton Inference Server.
@@ -68,7 +68,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 This will allow the `run.sh` file to access AWS commands to sync the S3 bucket model repository inside the `/tmp/model-repository` folder everytime the container is run:
 
 ```bash
-# run.sh
+# run.sh file
 aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
 ```
 
@@ -104,25 +104,27 @@ sudo amazon-linux-extras install docker
 sudo service docker start
 ```
 
-## `Step 2:` Clone the necessary files to EC2
+## `Step 2:` Transfer the Necessary Files to EC2
 ---
 
-If you've cloned this repository, you may have the necessary files to build the Docker image. Then follow this steps:
+If you've **cloned this repository**, you may have the **necessary files** to build the Docker image. Then follow this steps:
 
-**1. Create a Downloads Directory on the EC2**
+**1. Create a triton-server Directory on the EC2**
 
 ```bash
-mkdir /home/ec2-user/downloads
-cd /home/ec2-user/downloads/
+mkdir /home/ec2-user/triton-server
+cd /home/ec2-user/triton-server/
 ```
 
 **2. Transfer Files from Your Local Machine**
 
-Make sure to be inside the `triton-inference-server` folder on your `local machine` and **execute** this command:
+Transfer the necessary files (`run.sh`, `requirements.txt`, and `Dockerfile`) from your local machine to the EC2 instance using `scp`:
 ```bash
-scp -i <path_to_pem_file> Dockerfile requirements.txt run.sh ec2-user@<ec2_public_ip>:/home/ec2-user/downloads
+scp -i <your-ec2-key.pem> Dockerfile requirements.txt run.sh ec2-user@<your-ec2-ip>:/home/ec2-user/triton-server
 ```
-> Replace `<path_to_pem>` with the actual path to your `.pem` file, and `<ec2_public_ip>` with the EC2 instance's public IP address.
+Replace:
+- `<your-ec2-key.pem>` with the path to your EC2 key pair file.
+- `<your-ec2-ip>` with the public IP of your EC2 instance.
 
 ## `Step 3:` Build the Docker Image
 ---
@@ -130,7 +132,7 @@ scp -i <path_to_pem_file> Dockerfile requirements.txt run.sh ec2-user@<ec2_publi
 Build the Docker image using the `Dockerfile` that was transferred. This image includes the Triton Inference Server and all the necessary dependencies specified on the `requirements.txt` file.
 
 ```bash
-sudo docker build -t ec2-triton:latest -f Dockerfile .
+sudo docker build -t triton-server:latest -f Dockerfile .
 ```
 
 > Because you may be using a Mac with an ARM architecture (M chip), the Docker image you build locally may not be compatible with the x86 architecture of the EC2 instance. Therefore, it is recommended to build the Docker image directly on the EC2 instance where it will be deployed.
@@ -145,19 +147,28 @@ Run the Docker container with GPU support and expose the Triton Inference Server
 > Note that you have to set `--net=host` so FastAPI can access this ports from the localhost.
 
 ```bash
-docker run --gpus=all -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models \
---net=host -p 8000:8000 -p 8001:8001 -p 8002:8002 ec2-triton:latest
+docker run --gpus=all ---net=host -d -e MODEL_REPOSITORY=s3://<s3-bucket-name>/models triton-server:latest
 ```
 > You have to specify the `MODEL_REPOSITORY` environment variable for the `run.sh` script to be able to load the models from your S3 bucket.
+
+You can verify that the Triton Inference Server has started successfully by checking the Docker logs:
+```bash
+docker logs -f <docker-container-id>
+```
+> You can retrieve the `container-id` using:
+>
+>```bash
+>docker ps
+>```
 
 ---
 ## Accessing the Triton Inference Server
 
-You may want use a [client library](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client/README.html) to perform the requests to the Triton Inference Server.
+We will be using a [FastAPI frontend](fastapi-triton/) to interact with the Triton Inference Server, making it easier to handle inference requests through a RESTful API.
 
-Once the server is running, you can access:
-- `Inference requests`: http://<ec2_public_ip>:8000/v2/models
-- `gRPC requests`: Port 8001 (gRPC clients required).
-- `Metrics`: http://<ec2_public_ip>:8002/metrics
+### Open Ports
 
-Ensure that your security group allows inbound traffic on these ports.
+Because the Triton docker was launched using `--net=host` flag, the following ports will be available on `localhost` inside your EC2 machine: 
+- `8000`: http requests
+- `8001`: gRPC requests
+- `8002`: Metrics
