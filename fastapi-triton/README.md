@@ -5,17 +5,17 @@ This guide will walk you through the process of launching a FastAPI application 
 Make sure to read the [FastAPI Documentation](https://fastapi.tiangolo.com/) for further understanding.
 
 ---
-## Triton Client Integration
-
-The FastAPI frontend uses the `tritonclient` Python package to interact with the Triton Inference Server, specifically via the [`tritonclient.http`](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) module. 
-
-We recommend reading the [Triton client documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) to understand how the Triton client operates, how requests are sent, and how responses are handled. This knowledge will help you in customizing and expanding the FastAPI frontend.
-
----
 ## Prerequisites
 
 - Ensure that your [Triton Inference Server is running](..) on the EC2 instance.
 - Make sure you've already cloned the repository onto your local machine.
+
+---
+## Triton Client Integration on FastAPI
+
+The FastAPI frontend uses the `tritonclient` Python package to interact with the Triton Inference Server, specifically via the [`tritonclient.http`](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) module. 
+
+We recommend reading the [Triton client documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) to understand how the Triton client operates, how requests are sent, and how responses are handled. This knowledge will help you in customizing and expanding the FastAPI frontend.
 
 ---
 ## Understanding the FastAPI Dockerfile
