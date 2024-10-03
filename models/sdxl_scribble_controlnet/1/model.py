@@ -15,18 +15,20 @@ from PIL import Image
 
 
 def decode_image(img):
-    buff = BytesIO(base64.b64decode(img.encode("utf8")))
+    print("Decoding base64 image into PIL image...")
+    buff = BytesIO(base64.b64decode(img))
     image = Image.open(buff)
     return image
 
 
 def encode_images(images):
+    print("Encoding PIL images into base64 format...")
     encoded_images = []
     for image in images:
         buffer = BytesIO()
-        image.save(buffer, format="JPEG")
+        image.save(buffer, format="WEBP")
         img_str = base64.b64encode(buffer.getvalue())
-        encoded_images.append(img_str.decode("utf8"))
+        encoded_images.append(img_str)
 
     return encoded_images
 
@@ -66,9 +68,7 @@ class TritonPythonModel:
     def execute(self, requests):
         responses = []
         for request in requests:
-            # Debug: Print the incoming request details
-            print("Incoming request:")
-            print(request)
+            print("Request received!")
 
             try:
                 # Extract inputs from the request
@@ -89,13 +89,6 @@ class TritonPythonModel:
                     .as_numpy()
                     .item()
                 )
-
-                # Debug: Print extracted inputs
-                print(f"Prompt: {prompt}")
-                print(
-                    f"Image string: {image_str[:30]}..."
-                )  # Print only the first 30 characters
-                print(f"Conditioning scale: {conditioning_scale}")
 
                 # Decode the Base64 image string to a PIL image
                 image = decode_image(image_str)
@@ -122,21 +115,34 @@ class TritonPythonModel:
                 # Debug: Print input arguments before processing
                 print("Input arguments for model:", input_args)
 
-                # Call the model
-                images = self.pipe(**input_args).images
+                try:
+                    # Call the model
+                    images = self.pipe(**input_args).images
+                except Exception as e:
+                    print(f"Error generating image: {e}")
 
-                encoded_images = encode_images(images)
+                print(f"Generated image: {images}")
 
-                responses.append(
-                    pb_utils.InferenceResponse(
-                        [
-                            pb_utils.Tensor(
-                                "generated_image",
-                                np.array(encoded_images).astype(object),
-                            )
-                        ]
-                    )
+                try:
+                    encoded_images = encode_images(images)
+                except Exception as e:
+                    print(f"Error generating image: {e}")
+
+                print("Generated base64 image:")
+                print(encoded_images)
+
+                response = pb_utils.InferenceResponse(
+                    [
+                        pb_utils.Tensor(
+                            "generated_image",
+                            np.array(encoded_images).astype(object),
+                        )
+                    ]
                 )
+                print(f"InferenceResponse returned: {response}")
+
+                responses.append(response)
+
             except Exception as e:
                 print(f"Error processing request: {e}")
                 responses.append(
@@ -146,3 +152,7 @@ class TritonPythonModel:
                 )
 
         return responses
+
+    def finalize(self, args):
+        self.controlnet = None
+        self.pipe = None

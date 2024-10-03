@@ -9,6 +9,12 @@ TRITON_URL = "localhost:8000"
 MODEL_NAME = "sdxl_scribble_controlnet"
 
 
+class InferenceRequest(BaseModel):
+    prompt: str
+    image: str  # Base64 encoded image
+    conditioning_scale: float
+
+
 # Initialize Triton client during app startup
 @app.on_event("startup")
 async def startup_event():
@@ -19,12 +25,6 @@ async def startup_event():
             raise RuntimeError("Triton server is not live.")
     except Exception as e:
         raise RuntimeError(f"Failed to initialize Triton client: {str(e)}")
-
-
-class InferenceRequest(BaseModel):
-    prompt: str
-    image: str  # Base64 encoded image
-    conditioning_scale: float | None = None
 
 
 @app.get("/health")
@@ -59,31 +59,38 @@ async def sdxl_scribble_controlnet(request: InferenceRequest):
             httpclient.InferInput("conditioning_scale", [1, 1], "FP32"),
         ]
 
+        # Prepare output tensors
+        outputs = [
+            httpclient.InferRequestedOutput(name="generated_image", binary_data=False)
+        ]
+
         # Set data for the input tensors
         prompt_bytes = np.array([[request.prompt]], dtype=np.object_)
         image_bytes = np.array([[request.image]], dtype=np.object_)
-        conditioning_scale_array = np.array(
+        conditioning_scale_float = np.array(
             [[request.conditioning_scale]], dtype=np.float32
         )
 
-        print(f"Prompt Bytes: {prompt_bytes}, Type: {prompt_bytes.dtype}")
-        print(f"Image Bytes: {image_bytes}, Type: {image_bytes.dtype}")
-        print(f"Conditioning scale array: {conditioning_scale_array}")
-
         inputs[0].set_data_from_numpy(prompt_bytes)
-        print("Prompt appended to inputs correctly.")
         inputs[1].set_data_from_numpy(image_bytes)
-        print("Image appended to inputs correctly.")
-        inputs[2].set_data_from_numpy(conditioning_scale_array)
-        print("Conditioning scale appended to inputs!")
+        inputs[2].set_data_from_numpy(conditioning_scale_float)
 
         # Send inference request to Triton server
-        response = triton_client.infer(MODEL_NAME, inputs=inputs)
+        print("Sending inference request to triton...")
+        response = triton_client.infer(MODEL_NAME, inputs=inputs, outputs=outputs)
+
+        print("Response received!")
+        print(f"Response: {response}")
 
         # Process the response
-        generated_image = response.as_numpy("generated_image")[0].decode("utf-8")
+        generated_image = response.as_numpy("generated_image")
+        print(f"Generated image: {generated_image}")
 
-        return {"generated_image": generated_image}
+        # Ensure the image is decoded from numpy array to usable format (for example, base64 encoded string)
+        generated_image_str = generated_image[0]
+
+        # Return the result
+        return {"generated_image": generated_image_str}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

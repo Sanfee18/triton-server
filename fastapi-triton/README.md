@@ -5,15 +5,17 @@ This guide will walk you through the process of launching a FastAPI application 
 Make sure to read the [FastAPI Documentation](https://fastapi.tiangolo.com/) for further understanding.
 
 ---
+## Triton Client Integration
+
+The FastAPI frontend uses the `tritonclient` Python package to interact with the Triton Inference Server, specifically via the [`tritonclient.http`](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) module. 
+
+We recommend reading the [Triton client documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) to understand how the Triton client operates, how requests are sent, and how responses are handled. This knowledge will help you in customizing and expanding the FastAPI frontend.
+
+---
 ## Prerequisites
 
-- You should already have your [Triton Inference Server running](..) on the EC2 instance.
-- You will need the following files on your local machine:
-  - `main.py` (FastAPI application)
-  - `requirements.txt` (Python dependencies)
-  - `Dockerfile` (for building the FastAPI Docker container)
-
-Here’s a section for the FastAPI Dockerfile, similar to the Triton Inference Server documentation you provided:
+- Ensure that your [Triton Inference Server is running](..) on the EC2 instance.
+- Make sure you've already cloned the repository onto your local machine.
 
 ---
 ## Understanding the FastAPI Dockerfile
@@ -53,7 +55,6 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 ```
 
-
 **5. Define the Entrypoint**
 
 Finally, we define the command that will run when the Docker container starts. In this case, the command launches the FastAPI app using `uvicorn`, a lightning-fast ASGI server. We specify that the application will run on host `0.0.0.0` (which makes it accessible externally) and port `8080`.
@@ -62,20 +63,18 @@ Finally, we define the command that will run when the Docker container starts. I
 ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
 ```
 
-This setup ensures that once the container is running, FastAPI will be ready to process incoming requests and interact with the Triton Inference Server.
-
 ## `Step 1:` Create fastapi-triton folder on EC2
 ---
 
 ```bash
-# inside the triton-server folder
-mdkir fastapi-triton
+mkdir triton-server/fastapi-triton
+cd triton-server/fastapi-triton/
 ```
 
 ## `Step 2:` Transfer Files to EC2
 ---
 
-Transfer the necessary files (`main.py`, `requirements.txt`, and `Dockerfile`) from your local machine to the EC2 instance using `scp`:
+Go to your **local machine** and transfer the necessary files (`main.py`, `requirements.txt`, and `Dockerfile`) to the EC2 instance using `scp`:
 
 ```bash
 scp -i <your-ec2-key.pem> main.py requirements.txt Dockerfile ec2-user@<your-ec2-ip>:/home/ec2-user/triton-server/fastapi-triton/
@@ -84,10 +83,9 @@ scp -i <your-ec2-key.pem> main.py requirements.txt Dockerfile ec2-user@<your-ec2
 ## `Step 3:` Build the FastAPI Docker Image
 ---
 
-Navigate to the directory where you transferred the files and build the Docker image:
+Run the following command inside the `fastapi-triton` directory:
 
 ```bash
-cd fastapi-triton
 sudo docker build -t fastapi-triton:latest -f Dockerfile .
 ```
 
@@ -99,8 +97,7 @@ After the Docker image is built, you can run the FastAPI application on port `80
 ```bash
 docker run --net=host -d fastapi-triton
 ```
-
-The `--net=host` argument ensures that the FastAPI app can communicate with the Triton Inference Server on `localhost`.
+> The `--net=host` argument ensures that the FastAPI app can communicate with the Triton Inference Server on `localhost`.
 
 ## `Step 5:` Accessing the FastAPI Endpoints
 ---
@@ -125,10 +122,6 @@ Once the FastAPI container is running, you can access the default endpoints that
     "conditioning_scale": float number
   }
   ```
-
-### Triton Client Integration
-
-The FastAPI frontend uses the `tritonclient` Python package to interact with the Triton Inference Server, specifically via the [`tritonclient.http`](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) module. We recommend reading the [Triton client documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/_reference/tritonclient/tritonclient.http.html#module-tritonclient.http) to understand how the Triton client operates, how requests are sent, and how responses are handled. This knowledge will help you in customizing and expanding the FastAPI frontend.
 
 ### Matching Payloads with Model Configuration
 
