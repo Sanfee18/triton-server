@@ -10,7 +10,7 @@ I **strongly recommend** reading the [Triton Inference Server Documentation](htt
 ---
 ## Prerequisites 
 
-Before setting up the Triton Inference Server, ensure you meet the following requirements and understand key concepts that influence its operation:
+Before setting up the Triton Inference Server, ensure you meet the following requirements and take time to understand key concepts that influence its operation, as Triton is a complex program:
 
 - **EC2 Instance with GPU support**: You’ll need an instance type that provides at least **16GB of RAM** (such as `g4dn.2xlarge` or `g5.2xlarge`). Instances with 16GB or less may cause the Triton Inference Server to freeze during intensive tasks. Ensure you choose an instance with enough memory and GPU power to run your models smoothly, along with Amazon Linux OS.
 - **S3 Bucket**: Your model repository should be stored in an S3 bucket, organized following Triton’s **required structure**. 
