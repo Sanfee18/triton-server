@@ -65,29 +65,22 @@ async def sdxl_scribble_controlnet(request: InferenceRequest):
         ]
 
         # Set data for the input tensors
-        prompt_bytes = np.array([[request.prompt]], dtype=np.object_)
-        image_bytes = np.array([[request.image]], dtype=np.object_)
-        conditioning_scale_float = np.array(
-            [[request.conditioning_scale]], dtype=np.float32
-        )
+        prompt = np.array([[request.prompt]], dtype=np.object_)
+        image = np.array([[request.image.decode("utf8")]], dtype=np.object_)
+        conditioning_scale = np.array([[request.conditioning_scale]], dtype=np.float32)
 
-        inputs[0].set_data_from_numpy(prompt_bytes)
-        inputs[1].set_data_from_numpy(image_bytes)
-        inputs[2].set_data_from_numpy(conditioning_scale_float)
+        inputs[0].set_data_from_numpy(prompt)
+        inputs[1].set_data_from_numpy(image)
+        inputs[2].set_data_from_numpy(conditioning_scale)
 
         # Send inference request to Triton server
         print("Sending inference request to triton...")
         response = triton_client.infer(MODEL_NAME, inputs=inputs, outputs=outputs)
 
         print("Response received!")
-        print(f"Response: {response}")
 
         # Process the response
-        generated_image = response.as_numpy("generated_image")
-        print(f"Generated image: {generated_image}")
-
-        # Ensure the image is decoded from numpy array to usable format (for example, base64 encoded string)
-        generated_image_str = generated_image[0]
+        generated_image_str = response.get_output("generated_image")
 
         # Return the result
         return {"generated_image": generated_image_str}
