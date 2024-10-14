@@ -66,10 +66,16 @@ class TritonPythonModel:
         for request in requests:
             # Extract inputs from the request
             prompt = (
-                pb_utils.get_input_tensor_by_name(request, "prompt").as_numpy().item()
+                pb_utils.get_input_tensor_by_name(request, "prompt")
+                .as_numpy()
+                .item()
+                .decode("utf-8")
             )
             image = (
-                pb_utils.get_input_tensor_by_name(request, "image").as_numpy().item()
+                pb_utils.get_input_tensor_by_name(request, "image")
+                .as_numpy()
+                .item()
+                .decode("utf-8")
             )
             conditioning_scale = (
                 pb_utils.get_input_tensor_by_name(request, "conditioning_scale")
