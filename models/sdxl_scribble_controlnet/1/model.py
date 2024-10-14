@@ -15,7 +15,7 @@ from PIL import Image
 
 
 def decode_image(img):
-    buff = BytesIO(base64.b64decode(img.encode("utf8")))
+    buff = BytesIO(base64.b64decode(img))
     image = Image.open(buff)
     return image
 
