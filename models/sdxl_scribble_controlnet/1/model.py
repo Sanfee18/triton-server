@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import torch
 import triton_python_backend_utils as pb_utils
@@ -5,9 +6,8 @@ import triton_python_backend_utils as pb_utils
 from diffusers import (
     StableDiffusionXLControlNetPipeline,
     ControlNetModel,
-    AutoencoderKL,
+    DPMSolverMultistepScheduler,
 )
-from diffusers import EulerAncestralDiscreteScheduler
 
 from io import BytesIO
 import base64
@@ -39,27 +39,21 @@ class TritonPythonModel:
             torch_dtype=torch.float16,
         )
 
-        self.pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
-            "stabilityai/stable-diffusion-xl-base-1.0",
-            controlnet=self.controlnet,
+        self.pipeline = StableDiffusionXLControlNetPipeline.from_pretrained(
+            "RunDiffusion/Juggernaut-XL-v9",
             torch_dtype=torch.float16,
-        )
+            variant="fp16",
+            controlnet=self.controlnet,
+        ).to("cuda")
 
-        # change vae of sdxl
-        self.pipe.vae = AutoencoderKL.from_pretrained(
-            "madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16
+        self.pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
+            self.pipeline.scheduler.config
         )
+        self.pipeline.scheduler.config.use_karras_sigmas = True
 
-        # change scheduler
-        self.pipe.scheduler = EulerAncestralDiscreteScheduler.from_pretrained(
-            "stabilityai/stable-diffusion-xl-base-1.0", subfolder="scheduler"
-        )
-
-        # send pipe to gpu
-        self.pipe.to("cuda")
         # enable xformers (optional), requires xformers installation
         # https://github.com/facebookresearch/xformers#installing-xformers
-        self.pipe.unet.enable_xformers_memory_efficient_attention()
+        self.pipeline.unet.enable_xformers_memory_efficient_attention()
 
     def execute(self, requests):
         responses = []
@@ -86,19 +80,25 @@ class TritonPythonModel:
             # Decode base64 string into a PIL image
             image_pil = decode_image(image)
 
+            # Generate random seed
+            seed = random.randint(0, 2**32 - 1)
+            generator = torch.Generator(device="cpu").manual_seed(seed)
+
             # Prepare the input arguments for the model
             input_args = {
                 "prompt": prompt,
-                "negative_prompt": "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
-                "image": image_pil,
+                "negative_prompt": "",
                 "width": 1024,
                 "height": 1024,
+                "guidance_scale": 6,
                 "num_inference_steps": 30,
+                "generator": generator,
+                "image": image_pil,
                 "conditioning_scale": conditioning_scale,
             }
 
             # Call the model
-            images = self.pipe(**input_args).images
+            images = self.pipeline(**input_args).images
 
             encoded_images = encode_images(images)
 
