@@ -27,25 +27,6 @@ async def startup_event():
         raise RuntimeError(f"Failed to initialize Triton client: {str(e)}")
 
 
-@app.get("/health")
-async def health_check():
-    """
-    Check the health of the Triton server and model.
-    """
-    try:
-        if not triton_client.is_server_live():
-            raise HTTPException(status_code=503, detail="Triton server is not live.")
-
-        if not triton_client.is_model_ready(MODEL_NAME):
-            raise HTTPException(
-                status_code=503, detail=f"Model {MODEL_NAME} is not ready."
-            )
-
-        return {"status": "Healthy"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.post("/sdxl/scribble-controlnet/infer")
 async def sdxl_scribble_controlnet(request: InferenceRequest):
     """
@@ -85,6 +66,3 @@ async def sdxl_scribble_controlnet(request: InferenceRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# Run the FastAPI application with the command:
-# uvicorn main:app --host 0.0.0.0 --port 8080
