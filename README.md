@@ -42,8 +42,8 @@ You have two options for setting up the Triton Inference Server and FastAPI fron
 >
 > **We recommend reading through the manual setup at least once** to gain familiarity with the components involved, even if you decide to use Docker Compose.
 
----
 ### `Step 1:` Clone the Repository
+---
 
 To begin, clone the project repository from GitHub to your **local machine**. This repository contains all the necessary files for setting up the `Triton Inference Server` and the `FastAPI` frontend.
 
@@ -52,8 +52,8 @@ git clone https://github.com/Sanfee18/triton-server.git
 cd triton-server
 ```
 
----
 ### `Step 2:` Install Docker on the EC2 instance
+---
 
 Launch the EC2 and follow the next steps:
 
@@ -75,8 +75,8 @@ Launch the EC2 and follow the next steps:
     sudo service docker start
     ```
 
----
 ### `Step 3:` Transfer Files to EC2
+---
 
 Next, transfer the necessary files for setting up Triton Inference Server to your EC2 instance. This includes the `run.sh`, `requirements.txt`, `Dockerfile`, and the `docker-compose.yaml` and `triton.env` (skip bouth if you choose manual setup), and FastAPI files (`main.py`, `requirements.txt`, and `Dockerfile`).
 
@@ -114,8 +114,8 @@ Next, transfer the necessary files for setting up Triton Inference Server to you
     > sudo chown ec2-user:ec2-user /home/ec2-user/<directory-name>
     > ```
 
-## `Setting Up with Docker Compose`
 ---
+## `Setting Up with Docker Compose`
 
 As an alternative to manual setup, you can configure and deploy the Triton Inference Server alongside FastAPI using `docker-compose`, which simplifies the setup by running both services with a single command.
 
@@ -142,8 +142,8 @@ As an alternative to manual setup, you can configure and deploy the Triton Infer
 
     This command builds and launches both services in the background. Docker Compose will handle GPU support, environment variables, and the service dependency order, simplifying the setup significantly.
 
-## `Setting Up Manually`
 ---
+## `Setting Up Manually`
 ### Understanding Dockerfile
 
 > [!Important]
@@ -226,8 +226,8 @@ You can verify that the Triton Inference Server has started successfully by chec
 docker logs -f <docker-container-id>
 ```
 
----
 ### `Next Step:` Accessing the Triton Inference Server
+---
 
 We will be using a [FastAPI frontend](fastapi-triton/) to interact with the Triton Inference Server, making it easier to handle inference requests through a REST API.
 

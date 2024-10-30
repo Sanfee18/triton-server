@@ -82,8 +82,8 @@ docker run --net=host -d fastapi-triton
 ```
 > The `--net=host` argument ensures that the FastAPI app can communicate with the Triton Inference Server on `localhost`.
 
----
 ### Accessing the FastAPI Endpoint
+---
 
 Once the FastAPI container is running, you can access the endpoints that have been set up in the `main.py` file. You can modify or extend these endpoints to suit your specific needs.
 
