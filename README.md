@@ -38,10 +38,12 @@ You have two options for setting up the Triton Inference Server and FastAPI fron
 
 2. **[Manual Setup](#setting-up-manually)**: This option provides a step-by-step guide to setting up each component individually. Following this setup can give you a deeper understanding of the components involved and allows for more granular customization if needed.
 
-Choose the setup that best fits your needs. **We recommend reading through the manual setup at least once** to gain familiarity with the components involved, even if you decide to use Docker Compose.
+> [!Note]
+>
+> **We recommend reading through the manual setup at least once** to gain familiarity with the components involved, even if you decide to use Docker Compose.
 
-## `Step 1:` Clone the Repository
 ---
+### `Step 1:` Clone the Repository
 
 To begin, clone the project repository from GitHub to your **local machine**. This repository contains all the necessary files for setting up the `Triton Inference Server` and the `FastAPI` frontend.
 
@@ -50,98 +52,98 @@ git clone https://github.com/Sanfee18/triton-server.git
 cd triton-server
 ```
 
-## `Step 2:` Install Docker on the EC2 instance
 ---
+### `Step 2:` Install Docker on the EC2 instance
 
 Launch the EC2 and follow the next steps:
 
 1. **Update the Packages:**
 
-```bash
-sudo yum update -y
-```
+    ```bash
+    sudo yum update -y
+    ```
 
 2. **Install Docker:**
 
-```bash
-sudo amazon-linux-extras install docker
-```
+    ```bash
+    sudo amazon-linux-extras install docker
+    ```
 
 3. **Start the Docker Service:**
 
-```bash
-sudo service docker start
-```
+    ```bash
+    sudo service docker start
+    ```
 
-## `Step 3:` Transfer Files to EC2
 ---
+### `Step 3:` Transfer Files to EC2
+
 Next, transfer the necessary files for setting up Triton Inference Server to your EC2 instance. This includes the `run.sh`, `requirements.txt`, `Dockerfile`, and the `docker-compose.yaml` and `triton.env` (skip bouth if you choose manual setup), and FastAPI files (`main.py`, `requirements.txt`, and `Dockerfile`).
 
-1. **Create two Directories on EC2**:
+1. **Create Two Directories on EC2**:
 
-```bash
-mkdir /home/ec2-user/triton-server
-```
+    Create two directories to store the Triton Inference Server and FastAPI files:
 
-```bash
-mkdir /home/ec2-user/triton-server/fastapi-triton
-```
+    ```bash
+    mkdir /home/ec2-user/triton-server
+    mkdir /home/ec2-user/triton-server/fastapi-triton
+    ```
 
 2. **Transfer Files Using `scp`**:
 
-On your **local machine**:
+    On your **local machine** run:
 
-```bash
-cd /path/to/triton-server
-scp -i <your-ec2-key.pem> Dockerfile requirements.txt run.sh docker-compose.yaml triton.env ec2-user@<your-ec2-ip>:/home/ec2-user/triton-server
-```
+    ```bash
+    cd /path/to/triton-server
+    scp -i <your-ec2-key.pem> Dockerfile requirements.txt run.sh docker-compose.yaml triton.env ec2-user@<your-ec2-ip>:/home/ec2-user/triton-server
+    ```
 
-```bash
-cd fastapi-triton
-scp -i <your-ec2-key.pem> main.py requirements.txt Dockerfile ec2-user@<your-ec2-ip>:/home/ec2-user/triton-server/fastapi-triton/
-```
+    ```bash
+    cd fastapi-triton
+    scp -i <your-ec2-key.pem> main.py requirements.txt Dockerfile ec2-user@<your-ec2-ip>:/home/ec2-user/triton-server/fastapi-triton/
+    ```
 
-Replace:
-- `<your-ec2-key.pem>` with the path to your EC2 key pair file.
-- `<your-ec2-ip>` with your EC2 instance’s public IP.
+    Replace:
+    - `<your-ec2-key.pem>` with the path to your EC2 key pair file.
+    - `<your-ec2-ip>` with your EC2 instance’s public IP.
 
-> [!Note]
->
-> If you create the directories as the `root` user, you may encounter a `permission denied` error when attempting to transfer files using `scp`. To resolve this, run the following command to change the ownership of the directory to the `ec2-user`:
-> ```bash
-> sudo chown ec2-user:ec2-user /home/ec2-user/<directory-name>
-> ```
+    > [!Note]
+    >
+    > If you create the directories as the `root` user, you may encounter a `permission denied` error when attempting to transfer files using `scp`. To resolve this, run the following command to change the ownership of the directory to the `ec2-user`:
+    > ```bash
+    > sudo chown ec2-user:ec2-user /home/ec2-user/<directory-name>
+    > ```
 
----
 ## `Setting Up with Docker Compose`
-
-As an alternative to manual setup, you can configure and deploy the Triton Inference Server alongside FastAPI using `docker-compose`, which simplifies the setup by running both services with a single command. This section will guide you through modifying the environment file, configuring the `docker-compose` file, and launching your services.
-
-### 1. Modify Environment Variables
-
-In the project’s root directory, you’ll find a file named `triton.env`. To ensure Triton Inference Server loads your models, replace the `MODEL_REPOSITORY` variable in this file with your own S3 bucket URI containing the model repository.
-
-```plaintext
-# triton.env
-MODEL_REPOSITORY=<s3-bucket-URI>
-```
-
-### 2. Health Check and Service Dependencies
-
-To ensure FastAPI only starts after Triton Inference Server is fully operational, the `docker-compose.yaml` file includes a health check. This health check uses an internal Triton endpoint (`http://localhost:8000/v2/health/ready`) that confirms Triton is ready to handle requests before FastAPI starts, avoiding issues with premature API requests.
-
-### Using `docker-compose`
-
-Once you’ve updated `triton.env` with your S3 bucket URI, you can deploy both services by running:
-
-```bash
-docker-compose up --build -d
-```
-
-This command builds and launches both services in the background. Docker Compose will handle GPU support, environment variables, and the service dependency order, simplifying the setup significantly.
-
 ---
+
+As an alternative to manual setup, you can configure and deploy the Triton Inference Server alongside FastAPI using `docker-compose`, which simplifies the setup by running both services with a single command.
+
+1. **Modify Environment Variables:**
+
+    In the project’s root directory, you’ll find a file named `triton.env`. To ensure Triton Inference Server loads your models, replace the `MODEL_REPOSITORY` variable in this file with your own S3 bucket URI containing the model repository.
+
+    ```plaintext
+    # triton.env
+    MODEL_REPOSITORY=<s3-bucket-URI>
+    ```
+
+2. **Health Check and Service Dependencies**
+
+    To ensure FastAPI only starts after Triton Inference Server is fully operational, the `docker-compose.yaml` file includes a health check. This health check uses an internal Triton endpoint (`http://localhost:8000/v2/health/ready`) that confirms Triton is ready to handle requests before FastAPI starts, avoiding issues with premature API requests.
+
+3. **Using `docker-compose`**
+
+    Once you’ve updated `triton.env` with your S3 bucket URI, you can deploy both services by running:
+
+    ```bash
+    docker-compose up --build -d
+    ```
+
+    This command builds and launches both services in the background. Docker Compose will handle GPU support, environment variables, and the service dependency order, simplifying the setup significantly.
+
 ## `Setting Up Manually`
+---
 ### Understanding Dockerfile
 
 > [!Important]
@@ -150,44 +152,43 @@ This command builds and launches both services in the background. Docker Compose
 
 1. **Choose the correct Base Image:**
 
-Start by choosing a suitable Triton base image from the official [NVIDIA Docker catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags). This base image must align with the backend needed for your model.
+    Start by choosing a suitable Triton base image from the official [NVIDIA Docker catalog](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags). This base image must align with the backend needed for your model.
 
-Since our models are going to be loaded using `Python` via Hugging Face's diffusers library, we used the Docker image which only supports **PyTorch** and **Python** backends:
-```bash
-FROM nvcr.io/nvidia/tritonserver:24.08-pyt-python-py3
-```
+    Since our models are going to be loaded using `Python` via Hugging Face's diffusers library, we used the Docker image which only supports **PyTorch** and **Python** backends:
+    ```bash
+    FROM nvcr.io/nvidia/tritonserver:24.08-pyt-python-py3
+    ```
 
 2. **Install AWS CLI:**
 
-To synchronize models from an S3 bucket, install AWS CLI inside the Docker container:
+    To synchronize models from an S3 bucket, install AWS CLI inside the Docker container:
 
-```bash
-RUN apt-get update && apt-get install -y \
-        unzip \
-        && rm -rf /var/lib/apt/lists/*
+    ```bash
+    RUN apt-get update && apt-get install -y \
+            unzip \
+            && rm -rf /var/lib/apt/lists/*
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-        && unzip awscliv2.zip \
-        && ./aws/install \
-        && rm -f awscliv2.zip
-```
+    RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+            && unzip awscliv2.zip \
+            && ./aws/install \
+            && rm -f awscliv2.zip
+    ```
 
-This setup ensures that the `run.sh` script, executed when the container starts, can pull models from your S3 bucket into the local `/tmp/model_repository` directory:
+    This setup ensures that the `run.sh` script, executed when the container starts, can pull models from your S3 bucket into the local `/tmp/model_repository` directory:
 
-```bash
-# run.sh
-aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
-```
+    ```bash
+    # run.sh
+    aws s3 sync $MODEL_REPOSITORY /tmp/model_repository
+    ```
 
 3. **Add Dependencies:**
 
-Since Triton Docker images don’t come pre-installed with any Python libraries, you’ll need to manually add them to fit your requirements:
+    Since Triton Docker images don’t come pre-installed with any Python libraries, you’ll need to manually add them to fit your requirements:
 
-```bash
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
-```
-
+    ```bash
+    COPY requirements.txt /tmp/requirements.txt
+    RUN pip install -r /tmp/requirements.txt
+    ```
 
 ### `Step 1:` Build the Docker Image
 ---
@@ -225,8 +226,8 @@ You can verify that the Triton Inference Server has started successfully by chec
 docker logs -f <docker-container-id>
 ```
 
-### `Next Step:` Accessing the Triton Inference Server
 ---
+### `Next Step:` Accessing the Triton Inference Server
 
 We will be using a [FastAPI frontend](fastapi-triton/) to interact with the Triton Inference Server, making it easier to handle inference requests through a REST API.
 

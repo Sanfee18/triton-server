@@ -63,7 +63,7 @@ It’s important to understand the steps involved in creating the Docker image f
     ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
     ```
 
-## `Step 1:` Build the FastAPI Docker Image
+### `Step 1:` Build the FastAPI Docker Image
 ---
 
 Run the following command inside the `fastapi-triton` directory:
@@ -72,7 +72,7 @@ Run the following command inside the `fastapi-triton` directory:
 sudo docker build -t fastapi-triton:latest -f Dockerfile .
 ```
 
-## `Step 2:` Run the FastAPI Docker Container
+### `Step 2:` Run the FastAPI Docker Container
 ---
 
 After the Docker image is built, you can run the FastAPI application on port `8080` using the following command:
@@ -83,7 +83,7 @@ docker run --net=host -d fastapi-triton
 > The `--net=host` argument ensures that the FastAPI app can communicate with the Triton Inference Server on `localhost`.
 
 ---
-## Accessing the FastAPI Endpoint
+### Accessing the FastAPI Endpoint
 
 Once the FastAPI container is running, you can access the endpoints that have been set up in the `main.py` file. You can modify or extend these endpoints to suit your specific needs.
 
