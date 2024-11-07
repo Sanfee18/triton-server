@@ -9,12 +9,12 @@ I **strongly recommend** reading the [Triton Inference Server Documentation](htt
 > This is **not** a Docker or AWS tutorial. If you’re new to this technologies, I recommend checking out some great resources online to get up to speed before diving in!
 
 ---
-## Prerequisites 
+## Prerequisites
 
 Before setting up the Triton Inference Server, ensure you meet the following requirements and take time to understand key concepts that influence its operation, as Triton is a complex program:
 
 - **EC2 Instance with GPU support**: You’ll need an instance type that provides at least **16GB of RAM** (such as `g4dn.2xlarge` or `g5.2xlarge`). Instances with 16GB or less may cause the Triton Inference Server to freeze during intensive tasks. Ensure you choose an instance with enough memory and GPU power to run your models smoothly, along with Amazon Linux OS.
-- **S3 Bucket**: Your model repository should be stored in an S3 bucket, organized following Triton’s **required structure**. 
+- **S3 Bucket**: Your model repository should be stored in an S3 bucket, organized following Triton’s **required structure**.
 
     > In the `models` folder of this repository you have the model structure from our project:
     >```bash
@@ -28,19 +28,6 @@ Before setting up the Triton Inference Server, ensure you meet the following req
 
 - **IAM Role with AmazonS3ReadOnlyAccess:** Create or assign an IAM role to your EC2 instance that has the `AmazonS3ReadOnlyAccess` policy attached. This will allow Triton to securely access the model repository stored in your S3 bucket.
 - **Understanding Triton Backends**: Triton supports multiple [model backends](https://github.com/triton-inference-server/backend) like PyTorch, TensorFlow, ONNX or Python. It's important to understand these options so you can choose the most appropriate backend for your project, ensuring optimal performance and integration of your models.
-
----
-## Setup Options
-
-You have two options for setting up the Triton Inference Server and FastAPI frontend on your EC2 instance:
-
-1. **[Setup with Docker Compose (Recommended)](#setting-up-with-docker-compose)**: This option simplifies the process, allowing you to configure and run everything with a single command. Docker Compose manages both services, ensuring they start in the correct order. This is ideal if you’re looking to get up and running quickly.
-
-2. **[Manual Setup](#setting-up-manually)**: This option provides a step-by-step guide to setting up each component individually. Following this setup can give you a deeper understanding of the components involved and allows for more granular customization if needed.
-
-> [!Note]
->
-> **We recommend reading through the manual setup at least once** to gain familiarity with the components involved, even if you decide to use Docker Compose.
 
 ### `Step 1:` Clone the Repository
 ---
@@ -113,6 +100,19 @@ Next, transfer the necessary files for setting up Triton Inference Server to you
 > ```bash
 > sudo chown ec2-user:ec2-user /home/ec2-user/<directory-name>
 > ```
+
+---
+## Setup Options
+
+You have two options for setting up the Triton Inference Server and FastAPI frontend on your EC2 instance:
+
+1. **[Setup with Docker Compose (Recommended)](#setting-up-with-docker-compose)**: This option simplifies the process, allowing you to configure and run everything with a single command. Docker Compose manages both services, ensuring they start in the correct order. This is ideal if you’re looking to get up and running quickly.
+
+2. **[Manual Setup](#setting-up-manually)**: This option provides a step-by-step guide to setting up each component individually. Following this setup can give you a deeper understanding of the components involved and allows for more granular customization if needed.
+
+> [!Note]
+>
+> **We recommend reading through the manual setup at least once** to gain familiarity with the components involved, even if you decide to use Docker Compose.
 
 ---
 ## `Setting Up with Docker Compose`
@@ -235,11 +235,11 @@ We will be using a [FastAPI frontend](fastapi-triton/) to interact with the Trit
 
 Triton Inference Server will expose the following ports, which are essential for different types of requests:
 
-- **`8000`**: **HTTP Requests**  
+- **`8000`**: **HTTP Requests**
         This port is used for handling HTTP requests, allowing clients to communicate with the server using RESTful APIs for model inference.
 
-- **`8001`**: **gRPC Requests**  
+- **`8001`**: **gRPC Requests**
 This port enables communication via gRPC, a high-performance RPC framework, ideal for scenarios requiring efficient streaming and low-latency communication.
 
-- **`8002`**: **Metrics**  
+- **`8002`**: **Metrics**
 This port exposes server metrics, providing valuable insights into the performance and health of the Triton Inference Server, which can be monitored and analyzed.
