@@ -107,12 +107,12 @@ Next, transfer the necessary files for setting up Triton Inference Server to you
     - `<your-ec2-key.pem>` with the path to your EC2 key pair file.
     - `<your-ec2-ip>` with your EC2 instance’s public IP.
 
-    > [!Note]
-    >
-    > If you create the directories as the `root` user, you may encounter a `permission denied` error when attempting to transfer files using `scp`. To resolve this, run the following command to change the ownership of the directory to the `ec2-user`:
-    > ```bash
-    > sudo chown ec2-user:ec2-user /home/ec2-user/<directory-name>
-    > ```
+> [!Note]
+>
+> If you create the directories as the `root` user, you may encounter a `permission denied` error when attempting to transfer files using `scp`. To resolve this, run the following command to change the ownership of the directory to the `ec2-user`:
+> ```bash
+> sudo chown ec2-user:ec2-user /home/ec2-user/<directory-name>
+> ```
 
 ---
 ## `Setting Up with Docker Compose`
